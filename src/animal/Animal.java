@@ -8,5 +8,6 @@ public abstract class Animal {
     private Gender gender;
     private Date birthDate;
     private Date receptionDate;
-    private ArrayList<Command> listCommands;
+    private ArrayList<String> listCommands;
+    private String type;
 }
