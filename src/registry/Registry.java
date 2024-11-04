@@ -2,9 +2,11 @@ package registry;
 
 import animal.Animal;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 
-public class Registry {
+public class Registry implements Serializable, Iterable<Animal> {
     private ArrayList<Animal> animalList;
     private ArrayList<String> existingCommandList;
 
@@ -26,6 +28,12 @@ public class Registry {
 
     public void addNewCommand(String command){
         existingCommandList.add(command);;
+    }
+
+
+    @Override
+    public Iterator<Animal> iterator() {
+        return new RegistryIterator<>(animalList);
     }
 
 }
