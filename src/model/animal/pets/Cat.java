@@ -1,0 +1,20 @@
+package model.animal.pets;
+
+import model.animal.Gender;
+
+import java.time.LocalDate;
+import java.util.List;
+
+/**
+ * Сущность питомца кошка
+ */
+public class Cat extends Pets {
+
+    /**
+     * Конструктор
+     *
+     */
+    public Cat(String name, Gender gender, LocalDate birthDate, List<String> listCommands, boolean lovesPeople) {
+        super(name, gender, birthDate, listCommands, lovesPeople, "Кошка");
+    }
+}
