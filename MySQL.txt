@@ -1,0 +1,148 @@
+-- В ранее подключенном MySQL создать базу данных с названием "Human Friends".
+
+   -- Создать таблицы, соответствующие иерархии из вашей диаграммы классов.
+
+CREATE DATABASE HumanFriends; 
+
+USE HumanFriends;
+
+CREATE TABLE dogs
+(       
+   Id INT AUTO_INCREMENT PRIMARY KEY, 
+   Name VARCHAR(50), 
+   Gender VARCHAR(50),
+   Birthday DATE,
+   ReceptionDate DATE,
+   Commands VARCHAR(255),
+   Type VARCHAR(50),
+   LovesPeople TINYINT,
+);
+
+CREATE TABLE cats
+(       
+   Id INT AUTO_INCREMENT PRIMARY KEY, 
+   Name VARCHAR(50), 
+   Gender VARCHAR(50),
+   Birthday DATE,
+   ReceptionDate DATE,
+   Commands VARCHAR(255),
+   Type VARCHAR(50),
+   LovesPeople TINYINT,
+);
+
+CREATE TABLE hamsters
+(       
+   Id INT AUTO_INCREMENT PRIMARY KEY, 
+   Name VARCHAR(50), 
+   Gender VARCHAR(50),
+   Birthday DATE,
+   ReceptionDate DATE,
+   Commands VARCHAR(255),
+   Type VARCHAR(50),
+   LovesPeople TINYINT,
+);
+
+CREATE TABLE horses
+(       
+   Id INT AUTO_INCREMENT PRIMARY KEY, 
+   Name VARCHAR(50), 
+   Gender VARCHAR(50),
+   Birthday DATE,
+   ReceptionDate DATE,
+   Commands VARCHAR(255),
+   Type VARCHAR(50),
+   LoadCapacity INT,
+);
+
+CREATE TABLE camels
+(       
+   Id INT AUTO_INCREMENT PRIMARY KEY, 
+   Name VARCHAR(50), 
+   Gender VARCHAR(50),
+   Birthday DATE,
+   ReceptionDate DATE,
+   Commands VARCHAR(255),
+   Type VARCHAR(50),
+   LoadCapacity INT,
+);
+
+CREATE TABLE donkeys
+(       
+   Id INT AUTO_INCREMENT PRIMARY KEY, 
+   Name VARCHAR(50), 
+   Gender VARCHAR(50),
+   Birthday DATE,
+   ReceptionDate DATE,
+   Commands VARCHAR(255),
+   Type VARCHAR(50),
+   LoadCapacity INT,
+);
+
+   -- Заполнить таблицы данными о животных, их командах и датами рождения.
+
+INSERT INTO dogs (Name, Gender, Birthday, ReceptionDate, Commands, Type, LovesPeople) 
+VALUES ('Шарик', 'MALE','2020-10-13', '2021-04-17' 'сидеть, лежать , голос', 'собака', 0),
+('Бобик', 'MALE','2022-12-18', '2023-07-03' 'прыгать, сидеть, лежать , голос', 'собака', 1);  
+
+INSERT INTO cats (Name, Gender, Birthday, ReceptionDate, Commands, Type, LovesPeople)
+VALUES ('Барсик', 'MALE','2024-02-28', '2024-04-25' 'прыгать', 'кошка', 1),
+('Мурка', 'FEMALE','2023-11-04', '2024-01-27' 'NULL', 'кошка', 1);
+
+INSERT INTO hamsters (Name, Gender, Birthday, ReceptionDate, Commands, Type, LovesPeople)
+VALUES ('Кузя', 'MALE','2024-08-14', '2024-11-19' 'прыгать', 'хомяк', 0),
+('Пушистик', 'MALE','2025-01-08', '2025-01-18' 'NULL', 'хомяк', 1);
+
+INSERT INTO horses (Name, Gender, Birthday, ReceptionDate, Commands, Type, LoadCapacity) 
+VALUES ('Юлий', 'MALE','2021-03-05', '2023-05-07' 'идти, бежать, стоять', 'лошадь', 220),
+('Плотва', 'FEMALE','2022-03-09', '2023-04-29' 'идти, бежать, стоять', 'лошадь', 250);  
+
+INSERT INTO camels (Name, Gender, Birthday, ReceptionDate, Commands, Type, LoadCapacity) 
+VALUES ('Цезарь', 'MALE','2019-06-22', '2020-12-17' 'сидеть, лежать , идти', 'верблюд', 300),
+('Клеопатра', 'FEMALE','2020-04-16', '2021-08-13' 'сидеть, лежать , идти, стоять', 'верблюд', 320);  
+
+INSERT INTO donkeys (Name, Gender, Birthday, ReceptionDate, Commands, Type, LoadCapacity) 
+VALUES ('Моисей', 'MALE','2020-10-24', '2022-07-30' 'идти, стоять', 'осел', 270),
+('Йа', 'MALE','2018-07-12', '202019-04-23' 'идти, стоять, лежать', 'осел', 250);  
+
+   -- Удалить записи о верблюдах и объединить таблицы лошадей и ослов.
+
+SET SQL_SAFE_UPDATES = 0;
+DELETE FROM camels;
+
+SELECT * FROM horses
+UNION ALL SELECT  * FROM donkeys;
+
+   -- Создать новую таблицу для животных в возрасте от 1 до 3 лет и вычислить их возраст с точностью до месяца.
+
+CREATE TEMPORARY TABLE all_animals AS
+   SELECT Name, Gender, Birthday, ReceptionDate, Commands, Type FROM dogs
+   UNION SELECT Name, Gender, Birthday, ReceptionDate, Commands, Type FROM cats
+   UNION SELECT Name, Gender, Birthday, ReceptionDate, Commands, Type FROM hamsters
+   UNION SELECT Name, Gender, Birthday, ReceptionDate, Commands, Type FROM horses
+   UNION SELECT Name, Gender, Birthday, ReceptionDate, Commands, Type FROM donkeys;
+
+CREATE TABLE young_animals AS
+SELECT Name, Gender, Birthday, ReceptionDate, Commands, Type, TIMESTAMPDIFF(MONTH, Birthday, CURDATE()) AS Age_in_month
+FROM all_animals WHERE Birthday BETWEEN ADDDATE(curdate(), INTERVAL -3 YEAR) AND ADDDATE(CURDATE(),INTERVAL -1 YEAR);
+
+   -- Объединить все созданные таблицы в одну, сохраняя информацию о принадлежности к исходным таблицам.
+
+SELECT h.Name,  h.Gender, h.Birthday, h.ReceptionDate, h.Commands,  h.Type, ya.Age_in_month 
+FROM horses h
+LEFT JOIN young_animals ya ON ya.Name = h.Name
+UNION 
+SELECT d.Name,  d.Gender, d.Birthday, d.ReceptionDate, d.Commands,  d.Type, ya.Age_in_month
+FROM donkeys d 
+LEFT JOIN young_animals ya ON ya.Name = d.Name
+UNION
+SELECT h.Name,  c.Gender, c.Birthday, c.ReceptionDate, c.Commands,  c.Type, ya.Age_in_month
+FROM cats c
+LEFT JOIN young_animals ya ON ya.Name = c.Name
+UNION
+SELECT h.Name,  dog.Gender, dog.Birthday, dog.ReceptionDate, dog.Commands, dog.Type, ya.Age_in_month
+FROM dogs dog
+LEFT JOIN young_animals ya ON ya.Name = dog.Name
+UNION
+SELECT hm.Name,  hm.Gender, hm.Birthday, hm.ReceptionDate, hm.Commands,  hm.Type, ya.Age_in_month
+FROM hamsters hm
+LEFT JOIN young_animals ya ON ya.Name = hm.Name
